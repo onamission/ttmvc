@@ -8,7 +8,7 @@
     public function index(){
       //Set Data
       $data = [
-        'title' => 'Welcome To TraversyMVC'
+        'title' => 'Welcome To TT MVC'
       ];
 
       // Load homepage/index view
