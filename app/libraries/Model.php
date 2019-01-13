@@ -49,7 +49,7 @@ class Model {
 
     // Fetch ONE Record By ID
     public function fetchById($id){
-      return $this->db->fetchRecords($this->tableName, $this->fields, 'id', '=',
+      return $this->db->fetchOne($this->tableName, $this->fields, 'id', '=',
               $id, '', '1');
     }
 
@@ -78,5 +78,24 @@ class Model {
     // Delete a Record by ID
     public function delete($id){
         return $this->db->deleteRecords($this->tableName, '', 'id', '=', $id, '1');
+    }
+    
+    public function save(){
+        $fieldList = is_string($this->fields) 
+                ? explode(',', $this->fields)
+                : $this->fields;
+        $valueList = [];
+        foreach ($fieldList as $field) {
+            array_push($valueList, property_exists($this, $field) 
+                    ? $this->$field 
+                    : NULL); 
+        }
+        $values = implode(', ', $valueList);
+        // assume if there is an ID, then update, otherwise it is a new record
+        if (property_exists($this, 'id')) {
+            return $this->update($values, $this->fields, 'id', '=', $this->id);
+        } else {
+            return $this->add($values);
+        }
     }
 }
