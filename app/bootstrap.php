@@ -7,7 +7,6 @@
 
   // Autoload Core Classes
   spl_autoload_register(function ($className) {
-      echo APPROOT .'/libraries/'. $className . '.php\n';
       if (file_exists(APPROOT .'/libraries/'. $className . '.php')){
         require_once APPROOT . '/libraries/'. $className . '.php';
       }

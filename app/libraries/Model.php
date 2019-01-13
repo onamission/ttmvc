@@ -39,4 +39,44 @@ class Model {
     public function setAttribute($attrName, $value){
         $this->$attrName = $value;
     }
+    
+    // Fetch All Records
+    public function fetchAll($filterFields = '', $filterOps = '',
+            $filterValues = '', $sort = '', $limit = ''){
+      return $this->db->fetchRecords($this->tableName, $this->fields, 
+              $filterFields, $filterOps, $filterValues, $sort, $limit);
+    }
+
+    // Fetch ONE Record By ID
+    public function fetchById($id){
+      return $this->db->fetchRecords($this->tableName, $this->fields, 'id', '=',
+              $id, '', '1');
+    }
+
+    // Add a Record
+    public function add($values, $fields = ''){
+        // allow for the option of only sending in VALUES and assuming that
+        // all fields will have values added
+        if ($fields == ''){
+            $fields = $this->fields;
+        }
+        return $this->db->addRecords($this->tableName, $fields, $values);
+    }
+
+    // Update Record(s)
+    public function update($values, $fields = '', $filterFields = '',
+                $filterOps = '', $filterValues = ''){
+        // allow for the option of only sending in VALUES and assuming that
+        // all fields will have values added
+        if ($fields == ''){
+            $fields = $this->fields;
+        }
+        return $this->db->editRecords($this->tableName, $fields, $filterFields,
+                $filterOps, $filterValues, $values);
+    }
+
+    // Delete a Record by ID
+    public function delete($id){
+        return $this->db->deleteRecords($this->tableName, '', 'id', '=', $id, '1');
+    }
 }
