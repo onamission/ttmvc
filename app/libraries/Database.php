@@ -255,6 +255,34 @@ class Database {
         }
         return $this->resultset();
     }
+    
+    /**
+     * fetchOne
+     * 
+     * @param string $table
+     * @param string $fields
+     * @param mixed $filterFields
+     * @param mixed $filterOps
+     * @param mixed $filterValues
+     * @return a record
+     */
+    public function fetchOne($table = '', $fields = '', $filterFields = '', 
+            $filterOps = '=', $filterValues = '='){
+        $params = new sqlParams('select', $table, $fields, $filterFields, 
+                $filterOps, '', '1');
+        $sql = $this->buildSql($params);
+        $this->query($sql);
+        // prepare the filter parameters for binding
+        $fFields = $this->ensureArray($filterFields);
+        $fValues = $this->ensureArray($filterValues);
+        // bind the parameters for filter
+        for ($f = 0; $f < count($fFields); $f++){
+            if ($f < count($fValues)){
+                $this->bind("w_" . $fFields[$f], $fValues[$f]);
+            }
+        }
+        return $this->single();
+    }
 
     /**
      * addRecords
