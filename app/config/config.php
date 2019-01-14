@@ -12,3 +12,6 @@
   // Site Name
   define('SITENAME', '_ADD_SITE_NAME_');
   
+  define('DEFAULT_CONTROLLER', '_ADD_DEFAULT_CONTROLLER_NAME_');
+  define('DEFAULT_METHOD', '_ADD_DEFAULT_METHOD_');
+  

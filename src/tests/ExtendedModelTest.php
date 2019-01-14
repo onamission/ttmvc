@@ -17,7 +17,7 @@ class exampleModel extends Model {
 class extendedModelTest extends TestCase {
     public function testValidationHappyPath() {
         $model = new exampleModel();
-        $fieldsList = 'id, firstName, age, dob, isCustomer';
+        $fieldsList = $model->fields;
         $valuesList = [123, 'Tim', 56.6, '1962-08-29 06:12:54', true];
         $expected = true;
         $actual = $model->validate($fieldsList, $valuesList);
@@ -46,7 +46,7 @@ class extendedModelTest extends TestCase {
     
     public function testValidationVariations() {
         $model = new exampleModel();
-        $fieldsList = 'id, firstName, age, dob, isCustomer';
+        $fieldsList = $model->fields;
         // Integer as string.
         $valuesList = ['123', 'Tim', 56.6, '1962-08-29 06:12:54', true];
         $expected = true;
@@ -71,7 +71,7 @@ class extendedModelTest extends TestCase {
     
     public function testValidationExceptions() {
         $model = new exampleModel();
-        $fieldsList = 'id, firstName, age, dob, isCustomer';
+        $fieldsList = $model->fields;
         // NaN Integer
         $valuesList = ['blah', 'Tim', 56.6, '1962-08-29', true];
         $expected = 'Validation Error: id should be a INTEGER, but blah given';

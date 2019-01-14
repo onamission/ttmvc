@@ -1,41 +1,47 @@
 <?php
-
 /* 
  *  APP CORE CLASS
  *  Creates URL & Loads Core Controller
  *  URL Format - /controller/method/param1/param2
+ * 
+ * @author tturnquist
  */
 class Core {
     // Set Defaults
-    protected $currentController = 'Pages'; // Default controller
-    protected $currentMethod = 'index'; // Default method
+    protected $currentController = DEFAULT_CONTROLLER; // Default controller
+    protected $currentMethod = DEFAULT_METHOD; // Default method
     protected $params = []; // Set initial empty params array
 
     public function __construct(){
-      $url = $this->getUrl();
-      // Look in controllers folder for controller
-      if(file_exists('../app/controllers/'.ucwords($url[0]).'.php')){
-        // If exists, set as controller
-        $this->currentController = ucwords($url[0]);
-        // Unset 0 index
-        unset($url[0]);
-      }
-
-      // Require the current controller
-      require_once('../app/controllers/' . $this->currentController . '.php');
-
-      // Instantiate the current controller
-      $this->currentController = new $this->currentController;
-
-      // Check if second part of url is set (method)
-      if(isset($url[1])){
-        // Check if method/function exists in current controller class
-        if(method_exists($this->currentController, $url[1])){
-          // Set current method if it exsists
-          $this->currentMethod = $url[1];
-          // Unset 1 index
-          unset($url[1]);
+        $url = $this->getUrl();
+        // Look in controllers folder for controller
+        if(file_exists('../app/controllers/'.ucwords($url[0]).'.php')) {
+            // If exists, set as controller
+            $this->currentController = ucwords($url[0]);
+            // Unset 0 index
+            unset($url[0]);
         }
+
+        // Require the current controller
+        if(file_exists('../app/controllers/' . $this->currentController . '.php')) {
+            require_once('../app/controllers/' . $this->currentController . '.php');
+        } else {
+            require_once '../app/views/defaultview.php';
+            die;
+        }
+
+        // Instantiate the current controller
+        $this->currentController = new $this->currentController;
+
+        // Check if second part of url is set (method)
+        if(isset($url[1])) {
+            // Check if method/function exists in current controller class
+            if(method_exists($this->currentController, $url[1])) {
+              // Set current method if it exsists
+              $this->currentMethod = $url[1];
+              // Unset 1 index
+              unset($url[1]);
+          }
       }
 
       // Get params - Any values left over in url are params

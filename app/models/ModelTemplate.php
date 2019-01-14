@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ModelTemplate
  * This class is a template to build new models with. It is not designed to be
@@ -9,8 +8,8 @@
  *          PascalCase version of the the corresponding database table name 
  *          that is being used to store the data with a .php extention
  *      Name the Model the same as you named the file (without the php extention)
- *      In the __construct() method, change the $this->tableName variable to 
- *          match the db table name
+ *      In the __construct() method, replace <modeltemplate> in the 
+ *          $this->tableName variable assignment to match the db table name
  *      In the __construct() method, change the $this->fields variable to list
  *          the fields in your new model (should match the db table fields)
  *      In the validFieldTypes() method, change the return array to be a "hash"
@@ -35,7 +34,7 @@
 class ModelTemplate extends Model {
     public function __construct() {
         parent::__construct();
-        $this->tableName = 'modeltemplate';
+        $this->tableName = '<modeltemplate>';
         $this->fields = 'id, firstName, age, dob, isCustomer';
     } 
     
