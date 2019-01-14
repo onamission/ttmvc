@@ -1,5 +1,5 @@
 <?php
-require_once '../bootstrap.php';
+require_once '../../app/bootstrap.php';
 use PHPUnit\Framework\TestCase;
 
 class BaseModelTest extends TestCase {
