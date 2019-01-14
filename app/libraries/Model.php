@@ -14,7 +14,67 @@ class Model {
     public function __construct($tableName = '', $fields = ''){
         $this->db = new Database;
         $this->tableName = $tableName == '' ? strtolower(get_class($this)) : $tableName;
-        $this->fields = $fields;
+        if ($fields != ''){
+            $this->fields = $fields;
+        }
+    }
+    
+    /**
+     * validFieldTypes
+     * Returns an array of this model's field types for data validation.
+     * 
+     * @return array
+     */
+    protected function validFieldTypes() {
+        return [];
+    }
+    
+    /**
+     * validate
+     * Checks to see if all data values are of the proper type for their 
+     * respective field
+     * 
+     * @param mixed $fields: A list of the fields to check
+     * @param mixed $values: A list of the values to validate
+     * @return boolean
+     */
+    public function validate($fields, $values) {
+        $fields = ensureArray($fields);
+        $values = ensureArray($values);
+        if (count($fields) > count($values)) {
+            return "Validation Error: More fields than values";
+        }
+        if (count($fields) < count($values)) {
+            return "Validation Error: More values than fields";
+        }
+        $isValid = [];
+        for ($f = 0; $f < count($fields); $f++) {
+            $validType = isset($this->validFieldTypes()[$fields[$f]])
+                    ?$this->validFieldTypes()[$fields[$f]]
+                    : '';
+            if (
+                // Integers: if not zero, but intval() = 0, then not valid
+                ($validType == 'integer' && !preg_match('/^[\+\-]*\d+$/', $values[$f])) ||
+                // Floats: if not zero, but floatval() = 0, then not valid
+                ($validType == 'float' && !preg_match('/^[\+\-]*\d*\.*\d+$/', $values[$f])) ||
+                // Dates: if not formatted YYYY-MM-DD[ HH:NN:SS] and strtotime() = 0, then not valid
+                ($validType == 'date' && 
+                        !preg_match('/^\d[4]-\d[1,2]-\d[1,2]\s*\d*:*\d*:*\d*$/', $values[$f]) && 
+                        strtotime($values[$f]) == 0) ||
+                // Booleans: if not FALSE AND not TRUE, then not valid
+                ($validType == 'boolean' && $values[$f] != false && 
+                            $values[$f] !== true && $values[$f] !== 1) ||
+                // Strings: if is_string() = FALSE, then not valid
+                ($validType == 'string' && is_string($values[$f]) === false) 
+                ){
+                    array_push($isValid, "{$fields[$f]} should be a " .
+                    strtoupper($validType) . ", but {$values[$f]} given");
+            }
+        }
+        if (count($isValid) == 0) {
+            return true;
+        }
+        return "Validation Error: " . implode(", ", $isValid);
     }
     
     /**
@@ -96,7 +156,11 @@ class Model {
         if ($fields == ''){
             $fields = $this->fields;
         }
-        return $this->db->addRecords($this->tableName, $fields, $values);
+        $isValid = $this->validate($fields, $values);
+        if ($isValid === true) {
+            return $this->db->addRecords($this->tableName, $fields, $values);
+        }
+        return $isValid;
     }
 
     /**

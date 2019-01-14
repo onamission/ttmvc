@@ -121,22 +121,6 @@ class Database {
     }
 
     /**
-     * ensureArray
-     * Makes sure a variable is an array
-     * 
-     * @param mixed $list
-     * @return array
-     */
-    protected function ensureArray($list){
-        if (is_string($list)){
-            // make sure we have consistent spacing after commas
-            $list = str_replace(', ', ',', $list);
-            $list = explode(',', $list);
-        }
-        return $list;
-    }
-
-    /**
      * buildWhere
      *
      * @param mixed** $fields: A list of fields to create the WHERE clause
@@ -155,13 +139,9 @@ class Database {
             $ops = '=';
         }
         // ensure the fields are an array
-        if (is_string($fields)){
-            $fields = explode(',', $fields);
-        }
+        $fields = ensureArray($fields);
         // ensure the ops are an array
-        if (is_string($ops)){
-            $ops = explode(',', $ops);
-        }
+        $ops = ensureArray($ops);
         $whereHash = [];
         // created the comaparisons to a binding
         for ($f = 0; $f < count($fields); $f++){
@@ -245,8 +225,8 @@ class Database {
         $sql = $this->buildSql($params);
         $this->query($sql);
         // prepare the filter parameters for binding
-        $fFields = $this->ensureArray($filterFields);
-        $fValues = $this->ensureArray($filterValues);
+        $fFields = ensureArray($filterFields);
+        $fValues = ensureArray($filterValues);
         // bind the parameters for filter
         for ($f = 0; $f < count($fFields); $f++){
             if ($f < count($fValues)){
@@ -273,8 +253,8 @@ class Database {
         $sql = $this->buildSql($params);
         $this->query($sql);
         // prepare the filter parameters for binding
-        $fFields = $this->ensureArray($filterFields);
-        $fValues = $this->ensureArray($filterValues);
+        $fFields = ensureArray($filterFields);
+        $fValues = ensureArray($filterValues);
         // bind the parameters for filter
         for ($f = 0; $f < count($fFields); $f++){
             if ($f < count($fValues)){
@@ -297,8 +277,8 @@ class Database {
         $sql = $this->buildSql($params);
         $this->query($sql);
         // prepare the parameters for binding
-        $fields = $this->ensureArray($fields);
-        $values = $this->ensureArray($values);
+        $fields = ensureArray($fields);
+        $values = ensureArray($values);
         // bind the parameters
         for ($f = 0; $f < count($fields); $f++){
             if ($f < count($values)){
@@ -332,8 +312,8 @@ class Database {
         $sql = $this->buildSql($params);
         $this->query($sql);
         // prepare the parameters for binding
-        $fields = $this->ensureArray($fields);
-        $values = $this->ensureArray($values);
+        $fields = ensureArray($fields);
+        $values = ensureArray($values);
         // bind the parameters
         for ($f = 0; $f < count($fields); $f++){
             if ($f < count($values)){
@@ -341,8 +321,8 @@ class Database {
             }
         }
         // prepare the filter parameters for binding
-        $fFields = $this->ensureArray($filterFields);
-        $fValues = $this->ensureArray($filterValues);
+        $fFields = ensureArray($filterFields);
+        $fValues = ensureArray($filterValues);
         // bind the parameters for filter
         for ($f = 0; $f < count($fFields); $f++){
             if ($f < count($fValues)){
@@ -369,8 +349,8 @@ class Database {
         $sql = $this->buildSql($params);
         $this->query($sql);
         // prepare the parameters for binding
-        $fFields = $this->ensureArray($filterFields);
-        $fValues = $this->ensureArray($filterValues);
+        $fFields = ensureArray($filterFields);
+        $fValues = ensureArray($filterValues);
         // bind the parameters for filter
         for ($f = 0; $f < count($fFields); $f++){
             if ($f < count($fValues)){
