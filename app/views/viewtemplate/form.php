@@ -24,3 +24,22 @@
         placeholder="Add field2..."><?php echo $data['field2']; ?></textarea>
     <span class="invalid-feedback"><?php echo $data['field2_err']; ?></span>
 </div>
+<?php 
+    /*This section is a SELECT form element that can be used for foreign table 
+     * values. Replace variables where appropriate in the PHP loop below
+     */ 
+?>
+<!--
+<div class="form-group">
+    <label>Field3:<sup>*</sup></label>
+    <select name="field3" class="form-control form-control-lg required
+        <?php echo (!empty($data['field3_err'])) ? 'is-invalid' : ''; ?>" 
+        >
+            <option value='' selected disabled hidden>Select an option</option>
+        <?php 
+            foreach($data['foreigntabledata'] as $record){
+                echo "<option value={$record->id}>{$record->field}</option>";
+            }
+        ?></select>
+    <span class="invalid-feedback"><?php echo $data['field3_err']; ?></span>
+</div> -->
