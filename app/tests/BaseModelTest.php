@@ -16,7 +16,7 @@ class BaseModelTest extends TestCase {
         private $model;
         
     public function setUp() {
-        $this->model = new Model('posts', 'id, name');
+        $this->model = new Model();
     }
     
     public function testFetchAll() {

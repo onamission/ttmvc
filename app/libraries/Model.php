@@ -11,12 +11,10 @@ class Model {
      * @param string $tableName: the name of the table(s)
      * @param string $fields: a comma separated list of field names
      */
-    public function __construct($tableName = '', $fields = ''){
+    public function __construct(){
         $this->db = new Database;
-        $this->tableName = $tableName == '' ? strtolower(get_class($this)) : $tableName;
-        if ($fields != ''){
-            $this->fields = $fields;
-        }
+        // set the default tableName to the name of the class
+        $this->tableName = strtolower(get_class($this));
     }
     
     /**
