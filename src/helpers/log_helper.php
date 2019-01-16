@@ -2,7 +2,7 @@
 
 function logThis($msg='', $type='app', $fileName='', $method='', $msg_type='') {
     $logName = strtolower(SITENAME) . "_$type.log";
-    $fullFileName = APPROOT . "/../logs/stars/$logName";
+    $fullFileName = APPROOT . "/../logs/$logName";
     if (!file_exists($fullFileName)) {
 
     }
