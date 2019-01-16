@@ -3,7 +3,7 @@
     /**
      * ensureArray
      * Makes sure a variable is an array
-     * 
+     *
      * @param mixed $list
      * @return array
      */
@@ -13,5 +13,5 @@
             $list = str_replace(', ', ',', $list);
             $list = explode(',', $list);
         }
-        return $list;
+        return array_values($list);
     }

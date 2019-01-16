@@ -1,9 +1,9 @@
 <?php
-/* 
+/*
  *  APP CORE CLASS
  *  Creates URL & Loads Core Controller
  *  URL Format - /controller/method/param1/param2
- * 
+ *
  * @author tturnquist
  */
 class Core {

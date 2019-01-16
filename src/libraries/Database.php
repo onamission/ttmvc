@@ -18,7 +18,7 @@ class Database {
         $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname;
         $options = array (
                 PDO::ATTR_PERSISTENT => true,
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION 
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         );
 
         // Create a new PDO instanace
@@ -33,7 +33,7 @@ class Database {
     /**
      * query
      * Prepare statement with query
-     * 
+     *
      * @param string $query
      */
     public function query($sql) {
@@ -43,7 +43,7 @@ class Database {
     /**
      * bind
      * Bind values
-     * 
+     *
      * @param string $param
      * @param mixed $value
      * @param integer $type
@@ -64,14 +64,14 @@ class Database {
                     $type = PDO::PARAM_STR;
             }
         }
-        $this->stmt->bindValue($param, $value, $type);
+        $this->stmt->bindValue(":" . $param, $value, $type);
     }
 
     // Execute the prepared statement
     /**
      * execute
      * Execute the prepared statement
-     * 
+     *
      * @return boolean
      */
     public function execute(){
@@ -81,7 +81,7 @@ class Database {
     /**
      * resultset
      * Get result set as array of objects
-     * 
+     *
      * @return recordset
      */
     public function resultset(){
@@ -92,7 +92,7 @@ class Database {
     /**
      * single
      * Get single record as object
-     * 
+     *
      * @return record
      */
     public function single(){
@@ -103,7 +103,7 @@ class Database {
     /**
      * rowCount
      * Get record row count
-     * 
+     *
      * @return type
      */
     public function rowCount(){
@@ -113,7 +113,7 @@ class Database {
     /**
      * lastInsertId
      * Returns the last inserted ID
-     * 
+     *
      * @return type
      */
     public function lastInsertId(){
@@ -156,11 +156,11 @@ class Database {
         }
         return $where;
     }
-    
+
     /**
      * buildSql
      * This method builds SQL dynamically for consistency and convenience
-     * 
+     *
      * @param sqlParams $params: an object containing all parameters
      * @return string: a properly formatted SQL statement
      */
@@ -170,14 +170,16 @@ class Database {
         }
         $table = $params->table;
         $fields = $params->fields;
-        $sort = $params->sort == "" ? "" : " ORDER BY {$params->sort}";
+        $sort = $params->sort == ""
+            ? ""
+            : " ORDER BY {$params->sort}";
         $limit = $params->limit == "" ? "" : " LIMIT {$params->limit}";
         $filters = '';
         if ($params->filterFields != ''){
             // if there are filters, then create the WHERE statement
             $filters = $this->buildWhere($params->filterFields, $params->filterOps);
         }
-        
+
         if (strtolower($params->type) == 'delete'){
             return "DELETE FROM $table$filters$limit";
         }
@@ -203,12 +205,13 @@ class Database {
         if ($fields == ''){
             $fields = '*';
         }
-        return trim("SELECT $fields FROM $table$filters$sort$limit");
+        $sql = trim("SELECT $fields FROM $table$filters$sort$limit");
+        return $sql;
     }
 
     /**
      * fetchRecords
-     * 
+     *
      * @param string $table
      * @param string $fields
      * @param mixed $filterFields
@@ -218,11 +221,12 @@ class Database {
      * @param string $limit
      * @return array of recordsets
      */
-    public function fetchRecords($table = '', $fields = '', $filterFields = '', 
+    public function fetchRecords($table = '', $fields = '', $filterFields = '',
             $filterOps = '=', $filterValues = '=', $sort = '', $limit = ''){
-        $params = new sqlParams('select', $table, $fields, $filterFields, 
+        $params = new sqlParams('select', $table, $fields, $filterFields,
                 $filterOps, $sort, $limit);
         $sql = $this->buildSql($params);
+        logThis($sql, 'db', __FILE__. ' line: ' . __LINE__, __FUNCTION__, 'SQL');
         $this->query($sql);
         // prepare the filter parameters for binding
         $fFields = ensureArray($filterFields);
@@ -235,10 +239,10 @@ class Database {
         }
         return $this->resultset();
     }
-    
+
     /**
      * fetchOne
-     * 
+     *
      * @param string $table
      * @param string $fields
      * @param mixed $filterFields
@@ -246,11 +250,12 @@ class Database {
      * @param mixed $filterValues
      * @return a record
      */
-    public function fetchOne($table = '', $fields = '', $filterFields = '', 
+    public function fetchOne($table = '', $fields = '', $filterFields = '',
             $filterOps = '=', $filterValues = '='){
-        $params = new sqlParams('select', $table, $fields, $filterFields, 
+        $params = new sqlParams('select', $table, $fields, $filterFields,
                 $filterOps, '', '1');
         $sql = $this->buildSql($params);
+        logThis($sql, 'db', __FILE__. ' line: ' . __LINE__, __FUNCTION__, 'SQL');
         $this->query($sql);
         // prepare the filter parameters for binding
         $fFields = ensureArray($filterFields);
@@ -266,36 +271,41 @@ class Database {
 
     /**
      * addRecords
-     * 
+     *
      * @param string $table
      * @param string $fields
      * @param mixed $values
      * @return boolean
      */
     public function addRecords($table = '', $fields = '', $values = ''){
+        // Remove 'id' from field list
+        $fields = str_replace('id, ', '', $fields);
         $params = new sqlParams('insert', $table, $fields);
         $sql = $this->buildSql($params);
+        logThis($sql, 'db', __FILE__. ' line: ' . __LINE__, __FUNCTION__, 'SQL');
         $this->query($sql);
         // prepare the parameters for binding
         $fields = ensureArray($fields);
-        $values = ensureArray($values);
-        // bind the parameters
-        for ($f = 0; $f < count($fields); $f++){
-            if ($f < count($values)){
-                $this->bind($fields[$f], $values[$f]);
+
+        foreach ($fields as $key) {
+            if (empty($values[$key])) {
+                $values[$key] = '';
             }
+            $msg = $key ." | " . $values[$key];
+            logThis($msg, 'app', __FILE__. ' line: ' . __LINE__, __FUNCTION__, 'BIND');
+            $this->bind($key, $values[$key]);
         }
-        
+
         if ($this->execute()){
             return $this->lastInsertId();
         }else{
             return false;
         }
     }
-    
+
     /**
      * editRecords
-     * 
+     *
      * @param string $table
      * @param string $fields
      * @param mixed $filterFields
@@ -305,21 +315,21 @@ class Database {
      * @param string $values
      * @return boolean
      */
-    public function editRecords($table = '', $fields = '', $filterFields = '', 
+    public function editRecords($table = '', $fields = '', $filterFields = '',
             $filterOps = '=', $filterValues = '', $limit = '', $values = ''){
-        $params = new sqlParams('update', $table, $fields, $filterFields, 
-                $filterOps, $limit);
+        $params = new sqlParams('update', $table, $fields, $filterFields,
+                $filterOps, '', $limit);
         $sql = $this->buildSql($params);
+        logThis($sql, 'db', __FILE__. ' line: ' . __LINE__, __FUNCTION__, 'SQL');
         $this->query($sql);
-        // prepare the parameters for binding
-        $fields = ensureArray($fields);
-        $values = ensureArray($values);
+
         // bind the parameters
-        for ($f = 0; $f < count($fields); $f++){
-            if ($f < count($values)){
-                $this->bind($fields[$f], $values[$f]);
+        foreach ($values as $key => $val) {
+            if (!empty($values[$key])) {
+                $this->bind($key, $values[$key]);
             }
         }
+
         // prepare the filter parameters for binding
         $fFields = ensureArray($filterFields);
         $fValues = ensureArray($filterValues);
@@ -331,10 +341,10 @@ class Database {
         }
         return ($this->execute());
     }
-    
+
     /**
      * deleteRecords
-     * 
+     *
      * @param string $table
      * @param mixed $filterFields
      * @param mixed $filterOps
@@ -342,11 +352,12 @@ class Database {
      * @param string $limit
      * @return boolean
      */
-    public function deleteRecords($table = '', $filterFields = '', 
+    public function deleteRecords($table = '', $filterFields = '',
             $filterOps = '=', $filterValues = '', $limit = ''){
-        $params = new sqlParams('select', $table, $fields, $filterFields, 
-                $filterOps, $sort, $limit);
+        $params = new sqlParams('delete', $table, '', $filterFields,
+                $filterOps, $filterValues, '', $limit);
         $sql = $this->buildSql($params);
+        logThis($sql, 'db', __FILE__ . ' line: ' . __LINE__, __FUNCTION__, 'SQL');
         $this->query($sql);
         // prepare the parameters for binding
         $fFields = ensureArray($filterFields);
@@ -373,8 +384,8 @@ class sqlParams {
     public $filterOps = '';
     public $sort = '';
     public $limt = '';
-    
-    public function __construct($type = '', $table = '', $fields = '', 
+
+    public function __construct($type = '', $table = '', $fields = '',
             $filterFields = '', $filterOps = '', $sort = '', $limit = '') {
         // ensure lowercase type for comparison
         $this->type = strtolower($type);

@@ -1,1 +1,4 @@
 /* Main CSS File */
+
+/* to make the SELECT placeholder look better */
+select:invalid { color: gray; }

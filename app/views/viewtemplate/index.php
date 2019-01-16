@@ -5,8 +5,8 @@
     <h1>Posts</h1>
     </div>
     <div class="col-md-6">
-        <a class="btn btn-primary pull-right" 
-           href="<?php echo URLROOT; ?>/posts/add"><i 
+        <a class="btn btn-primary pull-right"
+           href="<?php echo URLROOT; ?>/posts/add"><i
                 class="fa fa-pencil" aria-hidden="true"></i> Add Post
         </a>
     </div>
@@ -25,21 +25,23 @@
         <td><?php echo $record->field1; ?></td>
         <td><?php echo $record->field2; ?></td>
         <td>
-            <a 
-               href="<?php echo URLROOT; ?>/~record~/detail/<?php echo $record->postId; ?>"
+            <a  class="btn btn-primary-outline charcoal"
+               href="<?php echo URLROOT; ?>/~record~/detail/<?php echo $record->id; ?>"
                title="View Details">
                 <i class="fa fa-eye" aria-hidden="true"></i>
             </a>
-            <a 
-               href="<?php echo URLROOT; ?>/~record~/edit/<?php echo $record->postId; ?>"
+            <a  class="btn btn-primary-outline charcoal"
+               href="<?php echo URLROOT; ?>/~record~/edit/<?php echo $record->id; ?>"
                title="Edit">
-                <i class="fa fa-pencil" aria-hidden="true"></i>
+                <i class="fas fa-pencil-alt" aria-hidden="true"></i>
             </a>
-            <a 
-               href="<?php echo URLROOT; ?>/~record~/delete/<?php echo $record->postId; ?>"
-               title="Delete">
-                <i class="fa fa-trash" aria-hidden="true"></i>
-            </a>
+            <form class="inline"
+                    action="<?php echo URLROOT; ?>/~record~/delete/<?php echo $record->id; ?>"
+                    method="post">
+                <button type="submit" class="link-button" value='submit_value'>
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+            </form>
         </td>
     </tr>
 <?php endforeach; ?>

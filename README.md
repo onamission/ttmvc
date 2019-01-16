@@ -10,6 +10,7 @@ I have added:
  * Simple field validation in base Model based on field type
  * View, Model and Controller templates
  * Separation of the MVC Framework from the application
+ * Simple logging
  
 Future developments I hope to make:
  * Built in Role Base Security
@@ -18,6 +19,7 @@ Future developments I hope to make:
 To use:
  * Download/Checkout to local Document Root folder
  * Create the database structure (tables & fields) in a local DB
+ * Open the public/.htaccess file and change the directory in line 4 to match your structure
  * Open the app/config/config.php file
    * Enter Database credentials and specifics
    * Change URLROOT value

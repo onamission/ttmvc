@@ -2,7 +2,7 @@
     /*
      * Use this template to create a rough view for your app. To customize this,
      * change ~record~ to be the name of your controller.
-     * 
+     *
      * Customize the UI by changing the class names to match Bootstrap or custom
      * CSS classes.
      */
