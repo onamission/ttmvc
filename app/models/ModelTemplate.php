@@ -34,10 +34,12 @@
 class ModelTemplate extends Model {
     public function __construct() {
         parent::__construct();
-        $this->tableName = '<modeltemplate>';
-        $this->fields = 'id, firstName, age, dob, isCustomer';
+        $this->viewTableName = '<modeltemplate> t1 JOIN <table2> t2 ON t1.fk_id = t2.id';
+        $this->viewFields = 't1.id, t1.firstName, t1.age, t1.dob, t2.isCustomer, t2.field2';
+        $this->changeTableName = '<modeltemplate>';
+        $this->changeFields = 'id, firstName, age, dob, isCustomer';
         /* Audit fields. Uncomment if needed
-        $this->fields .= ', created_by, updated_by, updated_date';
+        $this-><fields> .= ', created_by, updated_by, updated_date';
         */
     }
 

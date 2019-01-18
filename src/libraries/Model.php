@@ -2,19 +2,20 @@
 
 class Model {
     private $db;
-    protected $tableName;
-    protected $fields;
+    protected $viewTableName;
+    protected $changeTableName;
+    protected $viewFields;
+    protected $changeFields;
 
     /**
      * __construct
      *
-     * @param string $tableName: the name of the table(s)
-     * @param string $fields: a comma separated list of field names
      */
     public function __construct(){
         $this->db = new Database;
         // set the default tableName to the name of the class
-        $this->tableName = strtolower(get_class($this));
+        $this->viewTableName = strtolower(get_class($this));
+        $this->changeTableName = strtolower(get_class($this));
     }
 
     /**
@@ -105,7 +106,7 @@ class Model {
      */
     public function fetchAll($filterFields = '', $filterOps = '',
             $filterValues = '', $sort = '', $limit = ''){
-      return $this->db->fetchRecords($this->tableName, $this->fields,
+      return $this->db->fetchRecords($this->viewTableName, $this->viewFields,
               $filterFields, $filterOps, $filterValues, $sort, $limit);
     }
 
@@ -117,7 +118,7 @@ class Model {
      * @return record
      */
     public function fetchById($id){
-      return $this->db->fetchOne($this->tableName, $this->fields, 'id', '=',
+      return $this->db->fetchOne($this->viewTableName, $this->viewFields, 'id', '=',
               $id, '', '1');
     }
 
@@ -130,7 +131,7 @@ class Model {
      * @return record
      */
     public function fetchOneByAttr($attr, $value){
-      return $this->db->fetchOne($this->tableName, $this->fields, $attr, '=',
+      return $this->db->fetchOne($this->viewTableName, $this->viewFields, $attr, '=',
               $value, '', '1');
     }
 
@@ -146,13 +147,13 @@ class Model {
         // allow for the option of only sending in VALUES and assuming that
         // all fields will have values added
         if ($fields == ''){
-            $fields = $this->fields;
+            $fields = $this->getAttribute('changeFields');
         }
         $isValid = $this->validate($values);
         if ($isValid === true) {
             $msg = 'Validation passed with data: ' . implode(', ', $values);
             logThis($msg, 'app', __FILE__. ' line: ' . __LINE__, __FUNCTION__, 'add');
-            return $this->db->addRecords($this->tableName, $fields, $values);
+            return $this->db->addRecords($this->changeTableName, $fields, $values);
         }
         return $isValid;
     }
@@ -173,13 +174,13 @@ class Model {
         // allow for the option of only sending in VALUES and assuming that
         // all fields will have values added
         if (empty($fields)){
-            $fields = $this->getAttribute('fields');
+            $fields = $this->getAttribute('changeFields');
         }
         $isValid = $this->validate($values);
         if ($isValid === true) {
             $msg = 'Validation passed with data: ' . implode(', ', $values);
             logThis($msg, 'app', __FILE__. ' line: ' . __LINE__, __FUNCTION__, 'update');
-            return $this->db->editRecords($this->tableName, $fields, $filterFields,
+            return $this->db->editRecords($this->changeTableName, $fields, $filterFields,
             $filterOps, $filterValues, '', $values);
         }
         return $isValid;
@@ -193,7 +194,7 @@ class Model {
      * @return boolean
      */
     public function delete($id){
-        return $this->db->deleteRecords($this->tableName, 'id', '=', $id, '1');
+        return $this->db->deleteRecords($this->changeTableName, 'id', '=', $id, '1');
     }
 
     /**
@@ -205,9 +206,7 @@ class Model {
      * @return boolean
      */
     public function save(){
-        $fieldList = is_string($this->fields)
-                ? explode(',', $this->fields)
-                : $this->fields;
+        $fieldList = ensureArray($this->changeFields);
         $valueList = [];
         foreach ($fieldList as $field) {
             array_push($valueList, property_exists($this, $field)
@@ -217,7 +216,7 @@ class Model {
         $values = implode(', ', $valueList);
         // assume if there is an ID, then update, otherwise it is a new record
         if (property_exists($this, 'id')) {
-            return $this->update($values, $this->fields, 'id', '=', $this->id);
+            return $this->update($values, $this->changeFields, 'id', '=', $this->id);
         } else {
             return $this->add($values);
         }
